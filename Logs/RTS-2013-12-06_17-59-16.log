@@ -1,0 +1,13 @@
+2013-12-06 17:59:17,619 [1] DEBUG NetworkManager [(null)] - Refreshing Hosts
+2013-12-06 17:59:17,868 [1] DEBUG NetworkManager [(null)] - Master Server Event: HostListReceived
+2013-12-06 17:59:17,883 [1] DEBUG NetworkManager [(null)] - 1
+2013-12-06 18:00:15,172 [1] DEBUG NetworkManager [(null)] - Register Player All called for 0
+2013-12-06 18:00:15,179 [1] DEBUG NetworkManager [(null)] - Register Player All called for 1
+2013-12-06 18:00:15,186 [1] DEBUG LockStepManager [(null)] - Player 0 is ready to start the game.
+2013-12-06 18:00:15,198 [1] DEBUG LockStepManager [(null)] - GameStart called. My PlayerID: 1
+2013-12-06 18:00:15,205 [1] DEBUG NetworkManager [(null)] - Successfully diconnected from the server
+2013-12-06 18:02:15,670 [1] DEBUG NetworkManager [(null)] - Starting Server
+2013-12-06 18:02:15,677 [1] DEBUG NetworkManager [(null)] - startServer called
+2013-12-06 18:02:16,721 [1] DEBUG NetworkManager [(null)] - Server initialized
+2013-12-06 18:02:16,737 [1] DEBUG NetworkManager [(null)] - Expected player count : 2
+2013-12-06 18:02:16,994 [1] DEBUG NetworkManager [(null)] - Master Server Event: RegistrationSucceeded
