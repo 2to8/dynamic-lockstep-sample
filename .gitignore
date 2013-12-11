@@ -9,4 +9,8 @@
 /*.suo
 /*.user
 /*.pidb
+
+
 /bin/**
+/Log/**
+*.userprefs
