@@ -167,7 +167,10 @@ public class LockStepManager : MonoBehaviour {
 		bool nextTurn = NextTurn();
 		if(nextTurn) {
 			SendPendingAction ();
-			ProcessActions ();
+			//the first and second lockstep turn will not be ready to process yet
+			if(LockStepTurnID >= FirstLockStepTurnID + 3) {
+				ProcessActions ();
+			}
 		}
 		//otherwise wait another turn to recieve all input from all players
 		
@@ -213,7 +216,7 @@ public class LockStepManager : MonoBehaviour {
 			action = new NoAction();
 		}
 		//add action to our own list of actions to process
-		pendingActions.NextNextActions.Add (action);
+		pendingActions.AddAction(action, Convert.ToInt32(Network.player.ToString()), LockStepTurnID, LockStepTurnID);
 		//confirm our own action
 		confirmedActions.playersConfirmedCurrentAction.Add (Network.player);
 		//send action to all other players
@@ -223,17 +226,8 @@ public class LockStepManager : MonoBehaviour {
 	}
 	
 	private void ProcessActions() {
-//		log.Debug ("Processing actions - " + LockStepTurnID);
-		//if recieved actions
-		if(pendingActions.CurrentActions.Count > 0) {
-			foreach(IAction action in pendingActions.CurrentActions) {
-//				if(action is SelectUnits) {
-//					log.Debug ("SelectUnits Action processed");
-//				} else if(action is MoveSelectedUnits) {
-//					log.Debug ("MoveSelectedUnits Action processed");
-//				}
-				action.ProcessAction();
-			}
+		foreach(IAction action in pendingActions.CurrentActions) {
+			action.ProcessAction();
 		}
 	}
 	
@@ -245,24 +239,7 @@ public class LockStepManager : MonoBehaviour {
 			log.Debug ("Sending action failed");
 			//TODO: Error handle invalid actions recieve
 		} else {
-			//add action for processing later
-			if(lockStepTurn == LockStepTurnID + 1) {
-				//if action is for next turn, add for processing 3 turns away
-				pendingActions.NextNextNextActions.Add (action);
-			} else if(lockStepTurn == LockStepTurnID) {
-				//if recieved action during our current turn
-				//add for processing 2 turns away
-				pendingActions.NextNextActions.Add (action);
-			} else if(lockStepTurn == LockStepTurnID - 1) {
-				//if recieved action for last turn
-				//add for processing 1 turn away
-				pendingActions.NextActions.Add (action);
-				
-			} else {
-				//TODO: Error Handling
-				log.Debug ("WARNING!!!! Unexpected lockstepID recieved : " + lockStepTurn);
-				return;
-			}
+			pendingActions.AddAction(action, Convert.ToInt32(playerID), LockStepTurnID, lockStepTurn);
 			
 			//send confirmation
 			if(Network.isServer) {
@@ -273,11 +250,6 @@ public class LockStepManager : MonoBehaviour {
 			}
 		}
 	}
-	
-//	[RPC]
-//	public void RecieveAction(int lockStepTurn/*, byte[] actionAsBytes*/) {
-//		log.Debug("Test RecieveAction");
-//	}
 	
 	[RPC]
 	public void ConfirmActionServer(int lockStepTurn, string confirmingPlayerID, string confirmedPlayerID) {
@@ -320,7 +292,6 @@ public class LockStepManager : MonoBehaviour {
 	
 	private int GameFrame = 0;
 	
-	
 	private float AccumilatedTime = 0f;
 	
 	private float FrameLength = 0.05f; //50 miliseconds
@@ -345,7 +316,7 @@ public class LockStepManager : MonoBehaviour {
 			}
 		} else {
 			//update game
-			//TODO: Add custom Physics here
+			//TODO: Add custom physics
 			//SceneManager.Manager.TwoDPhysics.Update (GameFramesPerSecond);
 			
 			List<IHasGameFrame> finished = new List<IHasGameFrame>();
