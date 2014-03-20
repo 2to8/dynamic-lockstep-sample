@@ -22,7 +22,10 @@
 using System;
 
 [Serializable]
-public class NoAction : Action
+public abstract class Action
 {
-	public void ProcessAction() {}
+	public int NetworkAverage { get; set; }
+	public int RuntimeAverage { get; set; }
+	
+	public virtual void ProcessAction() {}
 }

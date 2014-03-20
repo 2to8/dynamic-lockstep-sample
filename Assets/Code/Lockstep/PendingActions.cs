@@ -26,11 +26,11 @@ public class PendingActions
 {
 	private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 	
-	public IAction[] CurrentActions;
-	private IAction[] NextActions;
-	private IAction[] NextNextActions;
+	public Action[] CurrentActions;
+	private Action[] NextActions;
+	private Action[] NextNextActions;
 	//incase other players advance to the next step and send their action before we advance a step
-	private IAction[] NextNextNextActions;
+	private Action[] NextNextNextActions;
 	
 	private int currentActionsCount;
 	private int nextActionsCount;
@@ -42,10 +42,10 @@ public class PendingActions
 	public PendingActions (LockStepManager lsm) {
 		this.lsm = lsm;
 		
-		CurrentActions = new IAction[lsm.numberOfPlayers];
-		NextActions = new IAction[lsm.numberOfPlayers];
-		NextNextActions = new IAction[lsm.numberOfPlayers];
-		NextNextNextActions = new IAction[lsm.numberOfPlayers];
+		CurrentActions = new Action[lsm.numberOfPlayers];
+		NextActions = new Action[lsm.numberOfPlayers];
+		NextNextActions = new Action[lsm.numberOfPlayers];
+		NextNextNextActions = new Action[lsm.numberOfPlayers];
 		
 		currentActionsCount = 0;
 		nextActionsCount = 0;
@@ -58,7 +58,7 @@ public class PendingActions
 		for(int i=0; i<CurrentActions.Length; i++) {
 			CurrentActions[i] = null;
 		}
-		IAction[] swap = CurrentActions;
+		Action[] swap = CurrentActions;
 		
 		//last turn's actions is now this turn's actions
 		CurrentActions = NextActions;
@@ -76,7 +76,7 @@ public class PendingActions
 		nextNextNextActionsCount = 0;
 	}
 	
-	public void AddAction(IAction action, int playerID, int currentLockStepTurn, int actionsLockStepTurn) {
+	public void AddAction(Action action, int playerID, int currentLockStepTurn, int actionsLockStepTurn) {
 		//add action for processing later
 		if(actionsLockStepTurn == currentLockStepTurn + 1) {
 			//if action is for next turn, add for processing 3 turns away
@@ -130,5 +130,45 @@ public class PendingActions
 		}
 		//if none of the conditions have been met, return false
 		return false;
+	}
+	
+	public int[] WhosNotReady() {
+		if(nextNextActionsCount == lsm.numberOfPlayers) {
+			//if this is the 2nd turn, check if all the actions sent out on the 1st turn have been recieved
+			if(lsm.LockStepTurnID == LockStepManager.FirstLockStepTurnID + 1) {
+				return null;
+			}
+			
+			//Check if all Actions that will be processed next turn have been recieved
+			if(nextActionsCount == lsm.numberOfPlayers) {
+				return null;
+			}else {
+				return WhosNotReady (NextActions, nextActionsCount);
+			}
+			
+		} else if(lsm.LockStepTurnID == LockStepManager.FirstLockStepTurnID) {
+			//if this is the 1st turn, no actions had the chance to be recieved yet
+			return null;
+		} else {
+			return WhosNotReady (NextNextActions, nextNextActionsCount);
+		}
+	}
+	
+	private int[] WhosNotReady(Action[] actions, int count) {
+		if(count < lsm.numberOfPlayers) {
+			int[] notReadyPlayers = new int[lsm.numberOfPlayers - count];
+			
+			int index = 0;
+			for(int playerID = 0; playerID < lsm.numberOfPlayers; playerID++) {
+				if(actions[playerID] == null) {
+					notReadyPlayers[index] = playerID;
+					index++;
+				}
+			}
+			
+			return notReadyPlayers;
+		} else {
+			return null;
+		}
 	}
 }
