@@ -36,7 +36,6 @@ public class RollingAverage {
 	public void Add(int newValue, int playerID) {
 		if(newValue > playerAverages[playerID]) {
 			//rise quickly
-			//playerAverages[playerID] = (playerAverages[playerID] * (3) + newValue * (7)) / 10;
 			playerAverages[playerID] = newValue;
 		} else {
 			//slowly fall down

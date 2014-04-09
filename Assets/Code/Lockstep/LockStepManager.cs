@@ -111,7 +111,7 @@ public class LockStepManager : MonoBehaviour {
 		
 		InitGameStartLists();
 		
-		nv.RPC ("ReadyToStart", RPCMode.OthersBuffered, Network.player.ToString());
+		nv.RPC ("ReadyToStart", RPCMode.AllBuffered, Network.player.ToString());
 	}
 	
 	private void CheckGameStart() {
@@ -120,9 +120,9 @@ public class LockStepManager : MonoBehaviour {
 			return;
 		}
 		//check if all expected players confirmed our gamestart message
-		if(playersConfirmedImReady.Count == numberOfPlayers - 1) {
+		if(playersConfirmedImReady.Count == numberOfPlayers) {
 			//check if all expected players sent their gamestart message
-			if(readyPlayers.Count == numberOfPlayers - 1) {
+			if(readyPlayers.Count == numberOfPlayers) {
 				//we are ready to start
 				log.Debug("All players are ready to start. Starting Game.");
 				
@@ -304,10 +304,10 @@ public class LockStepManager : MonoBehaviour {
 		
 		//add action to our own list of actions to process
 		pendingActions.AddAction(action, Convert.ToInt32(Network.player.ToString()), LockStepTurnID, LockStepTurnID);
-		//confirm our own action
-		confirmedActions.ConfirmAction(Convert.ToInt32(Network.player.ToString ()), LockStepTurnID, LockStepTurnID);
 		//start the confirmed action timer for network average
 		confirmedActions.StartTimer ();
+		//confirm our own action
+		confirmedActions.ConfirmAction(Convert.ToInt32(Network.player.ToString ()), LockStepTurnID, LockStepTurnID);
 		//send action to all other players
 		nv.RPC("RecieveAction", RPCMode.Others, LockStepTurnID, Network.player.ToString(), BinarySerialization.SerializeObjectToByteArray(action));
 		

@@ -32,7 +32,7 @@ public class NetworkManager : MonoBehaviour {
 	private bool refreshing = false;
 	private HostData[] hostData;
 	//TODO: Add ability to allow hosting user to set this number
-	public int NumberOfPlayers = 2;
+	public int NumberOfPlayers = 1;
 	
 	public Dictionary<string, NetworkPlayer> players;
 	
@@ -74,7 +74,6 @@ public class NetworkManager : MonoBehaviour {
 		bool useNAT = !Network.HavePublicAddress();
 		Network.InitializeServer(32, 25001, useNAT);
 		MasterServer.RegisterHost (gameTypeName, "Sample_Game_Name", NetworkHostMessages.GenerateHostComment(NumberOfPlayers));
-		players.Add (Network.player.ToString(), Network.player);
 	}
 	
 	private void refreshHostList() {
@@ -94,6 +93,11 @@ public class NetworkManager : MonoBehaviour {
 		//Notify any delegates that we are connected to the game
 		if(OnConnectedToGame != null) {
 			OnConnectedToGame();
+		}
+
+		players.Add (Network.player.ToString(), Network.player);
+		if(NumberOfPlayers == 1) {
+			StartGame ();
 		}
 	}
 	
@@ -128,6 +132,7 @@ public class NetworkManager : MonoBehaviour {
 	
 	[RPC]
 	public void StartGame() {
+		log.Debug ("StartGame called");
 		//send the start of game event
 		if(OnGameStart!=null) {
 			OnGameStart();
