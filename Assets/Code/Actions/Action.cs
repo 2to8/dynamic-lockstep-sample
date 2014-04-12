@@ -27,5 +27,5 @@ public abstract class Action
 	public int NetworkAverage { get; set; }
 	public int RuntimeAverage { get; set; }
 	
-	public virtual void ProcessAction() {}
+	public abstract void ProcessAction() {}
 }
