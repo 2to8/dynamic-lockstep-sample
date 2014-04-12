@@ -24,5 +24,5 @@ using System;
 [Serializable]
 public class NoAction : Action
 {
-	public void ProcessAction() {}
+	public override void ProcessAction() {}
 }
